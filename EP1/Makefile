@@ -26,15 +26,15 @@ ram: analyse | $(WORKDIR)
 rom: analyse | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) rom
 
-all_tb: ram_test rom_test
+all_tests: ram_test rom_test
 
-ram_tb: | $(WORKDIR)
+ram_test: | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) ram_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
 
-rom_tb: | $(WORKDIR)
+rom_test: | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) rom_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd

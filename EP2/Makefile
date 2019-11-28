@@ -26,15 +26,15 @@ reg: analyse | $(WORKDIR)
 regfile: analyse | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) regfile
 
-all_tb: reg_test regfile_test
+all_tests: reg_test regfile_test
 
-reg_tb: | $(WORKDIR)
+reg_test: | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) reg_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
 
-regfile_tb: | $(WORKDIR)
+regfile_test: | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) regfile_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd

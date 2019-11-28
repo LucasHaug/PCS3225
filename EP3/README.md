@@ -1,3 +1,3 @@
-# EP3-PCS3225
+# EP5-PCS3225
 
-EP3 de SD2.
+EP5 de SD2.

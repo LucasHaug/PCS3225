@@ -26,19 +26,20 @@ alu1bit: analyse | $(WORKDIR)
 alu: analyse | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) alu
 
-all_tb: alu1bit_test alu_test
+all_tests: alu1bit_test alu_test
 
-alu1bit_tb: | $(WORKDIR)
+alu1bit_test: | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) alu1bit_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
 
-alu_tb: | $(WORKDIR)
+alu_test: | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) alu_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
+
 
 check_syntax: | $(WORKDIR)
 	$(GHDL) -s $(GHDLFLAGS) $(TARGETS)
