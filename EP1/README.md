@@ -1,3 +1,3 @@
 # EP-PCS3225
 
-EP de SD2.
+EP1 de SD2.
