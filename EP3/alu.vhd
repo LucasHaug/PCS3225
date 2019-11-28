@@ -28,10 +28,10 @@ architecture alu_arch of alu is
     signal result : bit_vector(size - 1 downto 0) := (others => '0');
     signal cout   : bit_vector(size - 1 downto 0) := (others => '0');
     signal set    : bit_vector(size - 1 downto 0) := (others => '0');
-    
+
     signal less   : bit := '0';
 begin
-    alu_x: for i in (size - 1) downto 0 generate
+    full_alu: for i in (size - 1) downto 0 generate
         msb: if i = (size - 1) generate
             full_alu : alu1bit port map(A(i), B(i), '0', cout(i - 1), result(i), Co, set(i), Ov, S(3), S(2), S(1 downto 0));
         end generate;
@@ -40,10 +40,10 @@ begin
             full_alu : alu1bit port map(A(i), B(i), less, S(2), result(i), cout(i), set(i), open, S(3), S(2), S(1 downto 0));
         end generate;
 
-        middleb: if i > 0 and i < (size - 1) generate
+        middle_bits: if i > 0 and i < (size - 1) generate
             full_alu : alu1bit port map(A(i), B(i), '0', cout(i - 1), result(i), cout(i), set(i), open, S(3), S(2), S(1 downto 0));
         end generate;
-    end generate alu_x;
+    end generate full_alu;
 
     F <= result;
 
