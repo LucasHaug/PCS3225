@@ -1,0 +1,65 @@
+-- -------------------------------------------------------
+-- --! @file memorias.vhd
+-- --! @brief TB para memorias em VHDL
+-- --! @author Bruno Albertini (balbertini@usp.br)
+-- --! @date 20190606
+-- -------------------------------------------------------
+
+-- library ieee;
+-- use ieee.numeric_bit.all;
+
+-- entity memorias_tb is
+-- end memorias_tb;
+
+-- architecture testbench of memorias_tb is
+--   component rom is
+--     generic (
+--         addressSize : natural := 64;
+--         wordSize : natural := 32;
+--         mifFileName : string := "rom.dat"
+--     );
+--     port (
+--         addr : in bit_vector(addressSize - 1 downto 0);
+--         data : out bit_vector(wordSize - 1 downto 0)
+--     );
+--   end component;
+
+--   -- sinais de suporte
+--   signal address: bit_vector(31 downto 0);
+--   signal data_out : bit_vector(31 downto 0);
+--   signal stopc, clk: bit := '0';
+--   -- Periodo do clock
+--   constant period : time := 10 ns;
+-- begin
+--   -- Geração de clock
+--   clk <= stopc and (not clk) after period/2;
+--   -- Instâncias a serem testada
+--   dut_rom: ram generic map(6,32, "rom.dat") port map(address, data_out);
+--   -- Estímulos
+--   stim: process
+--     variable addr_tmp: bit_vector(4 downto 0);
+--   begin
+--     stopc <= '1';
+--     wrt <='0';
+--     --! Escrevendo um padrão na RAM
+--     for i in 0 to 31 loop
+--       addr_tmp := bit_vector(to_unsigned(i,5));
+--       data_in <= addr_tmp(3 downto 0);
+--       address <= addr_tmp;
+--       wrt<='1';
+--       wait until rising_edge(clk);
+--       wrt<='0';
+--     end loop;
+--     --! Lendo todas as memórias
+--     for i in 0 to 31 loop
+--       address <= bit_vector(to_unsigned(i,5));
+--       wait for 1 ns;
+
+--       assert data_out = address(3 downto 0)
+--         report "Erro";
+
+--     end loop;
+--     stopc <= '0';
+--     wait;
+--   end process;
+-- end architecture;
