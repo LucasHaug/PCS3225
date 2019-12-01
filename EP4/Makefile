@@ -2,7 +2,7 @@ GHDL := ghdl
 WORKDIR := work
 VERSION := 93
 
-TARGETS  := signExtend.vhd alucontrol.vhd controlunit.vhd alu1bit.vhd alu.vhd
+TARGETS  := signExtend.vhd alu.vhd alucontrol.vhd controlunit.vhd
 
 TARGETS += $(wildcard testbenches/*.vhd)
 
