@@ -2,7 +2,7 @@ GHDL := ghdl
 WORKDIR := work
 VERSION := 93
 
-TARGETS  := datapath.vhd polilegsc.vhd
+TARGETS  := polilegsc.vhd
 
 # TARGETS += $(wildcard testbenches/*.vhd)
 
@@ -31,24 +31,14 @@ $(WORKDIR):
 
 # Components
 
-all_components: datapath polilegsc
-
-datapath: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) datapath
+all_components: polilegsc
 
 polilegsc: analyse | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) polilegsc
 
 # Testbenches
 
-all_tests: datapath_test polilegsc_test
-
-datapath_test: | $(WORKDIR)
-	$(GHDL) -e $(GHDLFLAGS) datapath_tb
-	$(GHDL) -r $(GHDLFLAGS) datapath_tb --vcd=$(WORKDIR)/$@.vcd --stop-time=1000ns
-ifeq ($(VISUAL), 1)
-	gtkwave $(WORKDIR)/$@.vcd
-endif
+all_tests: polilegsc_test
 
 polilegsc_test: | $(WORKDIR)
 	$(GHDL) -e $(GHDLFLAGS) polilegsc_tb
