@@ -4,7 +4,7 @@ VERSION := 93
 
 TARGETS  := polilegsc.vhd
 
-# TARGETS += $(wildcard testbenches/*.vhd)
+TARGETS += testbenches/polilegsc_tb.vhd
 
 DEBUG := 1
 VISUAL := 0
