@@ -1,6 +1,6 @@
 GHDL := ghdl
 WORKDIR := work
-VERSION := 93
+VERSION := 08
 
 TARGETS  := polilegsc.vhd
 
