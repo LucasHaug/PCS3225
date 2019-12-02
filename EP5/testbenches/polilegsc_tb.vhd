@@ -1,109 +1,174 @@
 library ieee;
 use ieee.numeric_bit.all;
 use std.textio.all;
-entity ram_pcs is generic ( s_4d413ed6386f35334dc58ba505800: natural := 64;
-s_3a856e04d01e4274a96b3f18 : natural := 32;
-s_8c742f0be3eacbfa756486340c8e5d15578f852b908b8 : string := "ram.dat" );
-port ( system_clock, s_4d8acf7fdbfaf9e65b38a9f2c0105 : in bit;
-s_7e733d18f2a5f6a9b8de36457ca04d05045796ef8 : in bit_vector(s_4d413ed6386f35334dc58ba505800-1 downto 0);
-s_5041af0616d39483df4729d1ef76fd: in bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0);
-s_5c4a42d966770723929589420911d1ac1 : out bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0) );
-end ram_pcs;
-architecture behavioral of ram_pcs is constant s_ba290006b046201437bc073d34fcbb38b4308cdbdf866454875b3670: natural := 2**s_4d413ed6386f35334dc58ba505800;
-type s_4d984d0cae66cb8e8d4c3d89378bc is array (0 to s_ba290006b046201437bc073d34fcbb38b4308cdbdf866454875b3670-1) of bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0);
-impure function s_84e90c7f659bdefddfd1377e6cc1a4ef65e42379dc9(s_4c1ca6f4e4fa7ac21b5eaecc65625 : in string) return s_4d984d0cae66cb8e8d4c3d89378bc is file s_a3353fc4d663251f3e2bc4db7d4394e39b7ca10afa3346604e : text open read_mode is s_4c1ca6f4e4fa7ac21b5eaecc65625;
-variable s_83954019bc4acab02cbc47dabb35bc6eb273d01038 : line;
-variable s_61ae8a05c666864c2f2ae733e961d87db9 : bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0);
-variable s_6de15a01df5f68a8c8c888a7f2d11e079b31c : s_4d984d0cae66cb8e8d4c3d89378bc;
-begin for s_caa65c127742b36288ae6daeb06c7d1d9fb4ec0efddf825a0b0bbe67d54b in s_4d984d0cae66cb8e8d4c3d89378bc'range loop readline(s_a3353fc4d663251f3e2bc4db7d4394e39b7ca10afa3346604e, s_83954019bc4acab02cbc47dabb35bc6eb273d01038);
-read(s_83954019bc4acab02cbc47dabb35bc6eb273d01038, s_61ae8a05c666864c2f2ae733e961d87db9);
-s_6de15a01df5f68a8c8c888a7f2d11e079b31c(s_caa65c127742b36288ae6daeb06c7d1d9fb4ec0efddf825a0b0bbe67d54b):= s_61ae8a05c666864c2f2ae733e961d87db9;
-end loop;
-return s_6de15a01df5f68a8c8c888a7f2d11e079b31c;
-end;
-signal s_f09f01b5d89378d28419e3c9acc13c02d82c15c829d5df18cd9d046132af36bd: s_4d984d0cae66cb8e8d4c3d89378bc := ( "1000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000010000","0000000000000000000000000000000000000000000000000000000000001100", "0000000000000000000000000000000000000000000000000000000000000000");
-begin s_369d0ab5fddc67064ec119d:process(system_clock) begin if (system_clock='1' and system_clock'event) then if (s_4d8acf7fdbfaf9e65b38a9f2c0105='1')then s_f09f01b5d89378d28419e3c9acc13c02d82c15c829d5df18cd9d046132af36bd(to_integer(unsigned(s_7e733d18f2a5f6a9b8de36457ca04d05045796ef8))) <= s_5041af0616d39483df4729d1ef76fd;
-end if;
-end if;
-end process;
-s_5c4a42d966770723929589420911d1ac1 <= s_f09f01b5d89378d28419e3c9acc13c02d82c15c829d5df18cd9d046132af36bd(to_integer(unsigned(s_7e733d18f2a5f6a9b8de36457ca04d05045796ef8)));
+
+entity tb_ram is
+	generic (
+		addressSize: natural := 64;
+		wordSize : natural := 32;
+		filename : string := "ram.dat");
+	port (
+		clock, reset : in bit;
+		addr : in bit_vector(addressSize-1 downto 0);
+		input: in bit_vector(wordSize-1 downto 0);
+		output : out bit_vector(wordSize-1 downto 0) );
+end tb_ram;
+
+architecture behavioral of tb_ram is
+	constant memSize: natural := 2**addressSize;
+	type memType is array (0 to memSize-1) of bit_vector(wordSize-1 downto 0);
+
+	impure function loadFromFile(path : in string) return memType is
+		file my_file : text open read_mode is path;
+		variable myLine : line;
+		variable word : bit_vector(wordSize-1 downto 0);
+		variable mem : memType;
+		begin for i in memType'range loop
+			readline(my_file, myLine);
+			read(myLine, word);
+			mem(i) := word;
+		end loop;
+		return mem;
+	end;
+
+	signal defaultMem: memType := ( "1000000000000000000000000000000000000000000000000000000000000000", "0000000000000000000000000000000000000000000000000000000000010000","0000000000000000000000000000000000000000000000000000000000001100", "0000000000000000000000000000000000000000000000000000000000000000");
+	begin
+	main:process(clock) begin
+		if (clock='1' and clock'event) then if (reset='1') then
+			defaultMem(to_integer(unsigned(addr))) <= input;
+			end if;
+		end if;
+	end process;
+
+	output <= defaultMem(to_integer(unsigned(addr)));
 end behavioral;
 
 library ieee;
 use ieee.numeric_bit.all;
 use std.textio.all;
-entity rom_pcs is generic ( s_4d413ed6386f35334dc58ba505800: natural := 64;
-s_3a856e04d01e4274a96b3f18 : natural := 32;
-s_8c742f0be3eacbfa756486340c8e5d15578f852b908b8 : string := "rom.dat" );
-port ( s_7e733d18f2a5f6a9b8de36457ca04d05045796ef8 : in bit_vector(s_4d413ed6386f35334dc58ba505800-1 downto 0);
-s_87988181add8796c930415949a06f396460f7623c17 : out bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0) );
-end rom_pcs;
-architecture behavioral of rom_pcs is constant s_ba290006b046201437bc073d34fcbb38b4308cdbdf866454875b3670: natural := 2**s_4d413ed6386f35334dc58ba505800;
-type s_4d984d0cae66cb8e8d4c3d89378bc is array (0 to s_ba290006b046201437bc073d34fcbb38b4308cdbdf866454875b3670-1) of bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0);
-impure function s_84e90c7f659bdefddfd1377e6cc1a4ef65e42379dc9(s_4c1ca6f4e4fa7ac21b5eaecc65625 : in string) return s_4d984d0cae66cb8e8d4c3d89378bc is file s_a3353fc4d663251f3e2bc4db7d4394e39b7ca10afa3346604e : text open read_mode is s_4c1ca6f4e4fa7ac21b5eaecc65625;
-variable s_83954019bc4acab02cbc47dabb35bc6eb273d01038 : line;
-variable s_61ae8a05c666864c2f2ae733e961d87db9 : bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0);
-variable s_6de15a01df5f68a8c8c888a7f2d11e079b31c : s_4d984d0cae66cb8e8d4c3d89378bc;
-begin for s_caa65c127742b36288ae6daeb06c7d1d9fb4ec0efddf825a0b0bbe67d54b in s_4d984d0cae66cb8e8d4c3d89378bc'range loop readline(s_a3353fc4d663251f3e2bc4db7d4394e39b7ca10afa3346604e, s_83954019bc4acab02cbc47dabb35bc6eb273d01038);
-read(s_83954019bc4acab02cbc47dabb35bc6eb273d01038, s_61ae8a05c666864c2f2ae733e961d87db9);
-s_6de15a01df5f68a8c8c888a7f2d11e079b31c(s_caa65c127742b36288ae6daeb06c7d1d9fb4ec0efddf825a0b0bbe67d54b) := s_61ae8a05c666864c2f2ae733e961d87db9;
-end loop;
-return s_6de15a01df5f68a8c8c888a7f2d11e079b31c;
-end;
-constant s_f09f01b5d89378d28419e3c9acc13c02d82c15c829d5df18cd9d046132af36bd: s_4d984d0cae66cb8e8d4c3d89378bc := ( "11111000010000000000001111100001","11111000010000001000001111100010", "11111000010000010000001111100011", "11001011000000110000000001000100","10110100000000000000000100000100", "11001011000000110000000001000100", "10001010000000010000000010000101", "10110100000000000000000001100101", "11001011000000100000000001100011", "00010111111111111111111111111010", "11001011000000110000000001000010", "00010111111111111111111111111000", "11111000000000000100000000000010", "00010100000000000000000000000000", "00010100000000000000000000000000", "00010100000000000000000000000000" );
-begin s_87988181add8796c930415949a06f396460f7623c17 <= s_f09f01b5d89378d28419e3c9acc13c02d82c15c829d5df18cd9d046132af36bd(to_integer(unsigned(s_7e733d18f2a5f6a9b8de36457ca04d05045796ef8)));
+
+entity tb_rom is
+	generic (
+		addressSize: natural := 64;
+		wordSize : natural := 32;
+		filename : string := "ram.dat");
+	port (
+		addr : in bit_vector(addressSize-1 downto 0);
+		output : out bit_vector(wordSize-1 downto 0));
+end tb_rom;
+
+architecture behavioral of tb_rom is
+	constant memSize: natural := 2**addressSize;
+	type memType is array (0 to memSize-1) of bit_vector(wordSize-1 downto 0);
+
+	impure function loadFromFile(path : in string) return memType is
+		file my_file : text open read_mode is path;
+		variable myLine : line;
+		variable word : bit_vector(wordSize-1 downto 0);
+		variable mem : memType;
+
+		begin for i in memType'range loop
+			readline(my_file, myLine);
+			read(myLine, word); mem(i) := word;
+		end loop;
+		return mem;
+	end;
+
+	constant defaultMem: memType := ( "11111000010000000000001111100001","11111000010000001000001111100010", "11111000010000010000001111100011", "11001011000000110000000001000100","10110100000000000000000100000100", "11001011000000110000000001000100", "10001010000000010000000010000101", "10110100000000000000000001100101", "11001011000000100000000001100011", "00010111111111111111111111111010", "11001011000000110000000001000010", "00010111111111111111111111111000", "11111000000000000100000000000010", "00010100000000000000000000000000", "00010100000000000000000000000000", "00010100000000000000000000000000" );
+
+	begin output <= defaultMem(to_integer(unsigned(addr)));
 end behavioral;
 
 library ieee;
 use ieee.numeric_bit.all;
 use ieee.math_real.floor;
-entity polilegsc_tb is end entity;
-architecture behavioral of polilegsc_tb is component polilegsc is port(clock, reset: in bit;
-dmem_addr: out bit_vector(63 downto 0);
-dmem_dati: out bit_vector(63 downto 0);
-dmem_dato: in  bit_vector(63 downto 0);
-dmem_we:out bit;
-imem_addr: out bit_vector(63 downto 0);
-imem_data: in  bit_vector(31 downto 0));
-end component;
-component rom_pcs is generic ( s_4d413ed6386f35334dc58ba505800 : natural;
-s_3a856e04d01e4274a96b3f18 : natural;
-s_8c742f0be3eacbfa756486340c8e5d15578f852b908b8 : string );
-port ( s_7e733d18f2a5f6a9b8de36457ca04d05045796ef8 : in bit_vector(s_4d413ed6386f35334dc58ba505800-1 downto 0);
-s_87988181add8796c930415949a06f396460f7623c17 : out bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0) );
-end component;
-component ram_pcs is generic ( s_4d413ed6386f35334dc58ba505800 : natural;
-s_3a856e04d01e4274a96b3f18 : natural;
-s_8c742f0be3eacbfa756486340c8e5d15578f852b908b8 : string );
-port ( system_clock, s_4d8acf7fdbfaf9e65b38a9f2c0105 : in bit;
-s_7e733d18f2a5f6a9b8de36457ca04d05045796ef8 : in bit_vector(s_4d413ed6386f35334dc58ba505800-1 downto 0);
-s_5041af0616d39483df4729d1ef76fd : in bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0);
-s_5c4a42d966770723929589420911d1ac1 : out bit_vector(s_3a856e04d01e4274a96b3f18-1 downto 0) );
-end component;
-signal rom_data: bit_vector(31 downto 0);
-signal rom_data_addr, ram_data_addr, ram_data_to_be_written, ram_data_that_was_read: bit_vector(63 downto 0);
-signal ram_write_enable: bit;
-constant s_ea8ea012722df04dc9ac87d16065dcb6f2e6f8a7371de16f1b758b4c8f4f6e98 : time := 1 ns;
-signal s_b035336b56ddbc3bfca3d4b633a06256e0dcf14af03c73db615eb7: boolean := false;
-signal system_clock, reset_signal: bit:='0';
-begin system_clock <= not system_clock after s_ea8ea012722df04dc9ac87d16065dcb6f2e6f8a7371de16f1b758b4c8f4f6e98/2 when not s_b035336b56ddbc3bfca3d4b633a06256e0dcf14af03c73db615eb7 else '0';
-rom_instance_pcs: rom_pcs generic map (4, 32, "rom.dat") port map (rom_data_addr(5 downto 2), rom_data);
-ram_instance_pcs: ram_pcs generic map (2, 64, "ram.dat") port map (system_clock, ram_write_enable, ram_data_addr(4 downto 3), ram_data_to_be_written, ram_data_that_was_read);
-polilegsc_instance_pcs: polilegsc port map (system_clock, reset_signal, ram_data_addr, ram_data_to_be_written, ram_data_that_was_read, ram_write_enable, rom_data_addr, rom_data);
-s_921db241c60f0948ffd03122d79077c2dcc0c57d610f28:process begin report "BOT";
-s_b035336b56ddbc3bfca3d4b633a06256e0dcf14af03c73db615eb7 <= false;
-reset_signal <= '1';
-wait until system_clock'event and system_clock='1';
-wait until system_clock'event and system_clock='0';
-reset_signal <= '0';
-wait until ram_write_enable='1';
-wait until system_clock'event and system_clock='0';
-report "Valor final obtido: "&integer'image(to_integer(unsigned(ram_data_to_be_written)))&" esperado: 4.";
-assert to_integer(unsigned(ram_data_to_be_written))/=4 report "Valor final obtido condiz com o esperado. Teste passou.";
-assert to_integer(unsigned(ram_data_to_be_written))=4 report "Valor final obtido não condiz com o esperado. Teste falhou." severity failure;
-wait for 20 ns;
-s_b035336b56ddbc3bfca3d4b633a06256e0dcf14af03c73db615eb7<= true;
-report "EOT";
-wait;
-end process;
+
+entity polilegsc_tb is
+end entity;
+
+architecture behavioral of polilegsc_tb is
+	component polilegsc is port(
+		clock, reset: in bit;
+		dmem_addr: out bit_vector(63 downto 0);
+		dmem_dati: out bit_vector(63 downto 0);
+		dmem_dato: in  bit_vector(63 downto 0);
+		dmem_we:out bit;
+		imem_addr: out bit_vector(63 downto 0);
+		imem_data: in  bit_vector(31 downto 0));
+	end component;
+
+	component tb_rom is
+		generic (
+			addressSize : natural;
+			wordSize : natural;
+			filename : string);
+		port (
+			addr : in bit_vector(addressSize-1 downto 0);
+			output : out bit_vector(wordSize-1 downto 0));
+	end component;
+
+	component tb_ram is
+		generic (
+			addressSize : natural;
+			wordSize : natural;
+			filename : string);
+		port (
+			clock, reset : in bit;
+			addr : in bit_vector(addressSize-1 downto 0);
+			input : in bit_vector(wordSize-1 downto 0);
+			output : out bit_vector(wordSize-1 downto 0));
+		end component;
+
+	signal rom_data: bit_vector(31 downto 0);
+	signal rom_addr, ram_addr, ram_input, ram_output: bit_vector(63 downto 0);
+	signal ram_reset: bit;
+	constant PERIOD : time := 1 ns;
+	signal finished: boolean := false;
+	signal clock, reset: bit:='0';
+
+	begin
+		clock <= not clock after PERIOD/2 when not finished else '0';
+
+		theROM: tb_rom
+			generic map (4,32,"rom.dat")
+			port map (
+				rom_addr(5 downto 2),
+				rom_data);
+
+		theRAM: tb_ram
+			generic map (2, 64, "ram.dat")
+			port map (
+				clock,
+				ram_reset,
+				ram_addr(4 downto 3),
+				ram_input,
+				ram_output);
+		theCPU: polilegsc port map (
+			clock,
+			reset,
+			ram_addr,
+			ram_input,
+			ram_output,
+			ram_reset,
+			rom_addr,
+			rom_data);
+
+		main:process
+		begin
+			report "BOOT";
+
+			finished <= false;
+			reset <= '1';
+			wait until clock'event and clock='1';
+			wait until clock'event and clock='0';
+			reset <= '0';
+			wait until ram_reset='1';
+			wait until clock'event and clock='0'; report "Valor final obtido: "&integer'image(to_integer(unsigned(ram_input)))&" esperado: 4.";
+			assert to_integer(unsigned(ram_input))/=4 report "Valor final obtido condiz com o esperado. Teste passou.";
+			assert to_integer(unsigned(ram_input))=4 report "Valor final obtido não condiz com o esperado. Teste falhou." severity failure;
+			wait for 20 ns;
+			finished <= true;
+			report "EOT";
+			wait;
+		end process;
 end architecture behavioral;
