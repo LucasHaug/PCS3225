@@ -59,14 +59,12 @@ ifeq ($(VISUAL), 1)
 endif
 
 alucontrol_test: | $(WORKDIR)
-	$(GHDL) -e $(GHDLFLAGS) alucontrol_tb
 	$(GHDL) -r $(GHDLFLAGS) alucontrol_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
 
 controlunit_test: | $(WORKDIR)
-	$(GHDL) -e $(GHDLFLAGS) controlunit_tb
 	$(GHDL) -r $(GHDLFLAGS) controlunit_tb --vcd=$(WORKDIR)/$@.vcd
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd

@@ -41,7 +41,6 @@ polilegsc: analyse | $(WORKDIR)
 all_tests: polilegsc_test
 
 polilegsc_test: | $(WORKDIR)
-	$(GHDL) -e $(GHDLFLAGS) polilegsc_tb
 	$(GHDL) -r $(GHDLFLAGS) polilegsc_tb --vcd=$(WORKDIR)/$@.vcd --stop-time=1000ns
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
