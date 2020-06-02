@@ -47,4 +47,4 @@ ifeq ($(VISUAL), 1)
 	$(AT)gtkwave $(WORKDIR)/$@.vcd
 endif
 
-.PHONY: all analyse check_syntax clean
+.PHONY: all analyse check_syntax clean test
