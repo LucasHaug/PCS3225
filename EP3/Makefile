@@ -15,16 +15,21 @@ ifeq ($(DEBUG), 1)
 GHDLFLAGS += -v
 endif
 
+# General
+
 analyse: | $(WORKDIR)
 	$(GHDL) -a $(GHDLFLAGS) $(TARGETS)
 
-all_components: alu1bit alu
+check_syntax: | $(WORKDIR)
+	$(GHDL) -s $(GHDLFLAGS) $(TARGETS)
 
-alu1bit: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) alu1bit
+clean:
+	rm -rf $(WORKDIR)
 
-alu: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) alu
+$(WORKDIR):
+	mkdir -p $(WORKDIR)
+
+# Tests
 
 all_tests: alu1bit_test alu_test
 
@@ -39,15 +44,5 @@ alu_test: | $(WORKDIR)
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
-
-
-check_syntax: | $(WORKDIR)
-	$(GHDL) -s $(GHDLFLAGS) $(TARGETS)
-
-clean:
-	rm -rf $(WORKDIR)
-
-$(WORKDIR):
-	mkdir -p $(WORKDIR)
 
 .PHONY: all analyse check_syntax clean

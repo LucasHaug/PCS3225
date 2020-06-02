@@ -29,26 +29,7 @@ clean:
 $(WORKDIR):
 	mkdir -p $(WORKDIR)
 
-# Components
-
-all_components: signExtend alucontrol controlunit alu1bit alu
-
-signExtend: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) signExtend
-
-alucontrol: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) alucontrol
-
-controlunit: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) controlunit
-
-alu1bit: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) alu1bit
-
-alu: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) alu
-
-# Testbenches
+# Tests
 
 all_tests: signExtend_test alucontrol_test controlunit_test alu1bit_test alu_test
 

@@ -15,16 +15,21 @@ ifeq ($(DEBUG), 1)
 GHDLFLAGS += -v
 endif
 
+# General
+
 analyse: | $(WORKDIR)
 	$(GHDL) -a $(GHDLFLAGS) $(TARGETS)
 
-all_components: ram rom
+check_syntax: | $(WORKDIR)
+	$(GHDL) -s $(GHDLFLAGS) $(TARGETS)
 
-ram: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) ram
+clean:
+	rm -rf $(WORKDIR)
 
-rom: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) rom
+$(WORKDIR):
+	mkdir -p $(WORKDIR)
+
+# Tests
 
 all_tests: ram_test rom_test
 
@@ -39,14 +44,5 @@ rom_test: | $(WORKDIR)
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
-
-check_syntax: | $(WORKDIR)
-	$(GHDL) -s $(GHDLFLAGS) $(TARGETS)
-
-clean:
-	rm -rf $(WORKDIR)
-
-$(WORKDIR):
-	mkdir -p $(WORKDIR)
 
 .PHONY: all analyse check_syntax clean

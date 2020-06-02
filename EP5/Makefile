@@ -29,14 +29,7 @@ clean:
 $(WORKDIR):
 	mkdir -p $(WORKDIR)
 
-# Components
-
-all_components: polilegsc
-
-polilegsc: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) polilegsc
-
-# Testbenches
+# Tests
 
 all_tests: polilegsc_test
 

@@ -15,18 +15,21 @@ ifeq ($(DEBUG), 1)
 GHDLFLAGS += -v
 endif
 
+# General
+
 analyse: | $(WORKDIR)
 	$(GHDL) -a $(GHDLFLAGS) $(TARGETS)
 
-all_components: reg regfile
+check_syntax: | $(WORKDIR)
+	$(GHDL) -s $(GHDLFLAGS) $(TARGETS)
 
-reg: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) reg
+clean:
+	rm -rf $(WORKDIR)
 
-regfile: analyse | $(WORKDIR)
-	$(GHDL) -r $(GHDLFLAGS) regfile
+$(WORKDIR):
+	mkdir -p $(WORKDIR)
 
-all_tests: reg_test regfile_test
+# Tests
 
 reg_test: | $(WORKDIR)
 	$(GHDL) -r $(GHDLFLAGS) reg_tb --vcd=$(WORKDIR)/$@.vcd
@@ -39,14 +42,5 @@ regfile_test: | $(WORKDIR)
 ifeq ($(VISUAL), 1)
 	gtkwave $(WORKDIR)/$@.vcd
 endif
-
-check_syntax: | $(WORKDIR)
-	$(GHDL) -s $(GHDLFLAGS) $(TARGETS)
-
-clean:
-	rm -rf $(WORKDIR)
-
-$(WORKDIR):
-	mkdir -p $(WORKDIR)
 
 .PHONY: all analyse check_syntax clean
