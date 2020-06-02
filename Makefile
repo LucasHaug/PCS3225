@@ -42,9 +42,9 @@ $(WORKDIR):
 # Tests
 
 test: | $(WORKDIR)
-	$(AT)$(GHDL) -r $(GHDLFLAGS) $(COMPONENT_TO_TEST)_tb --vcd=$(WORKDIR)/$@.vcd
+	$(AT)$(GHDL) -r $(GHDLFLAGS) $(COMPONENT_TO_TEST)_tb --vcd=$(WORKDIR)/$(COMPONENT_TO_TEST)_test.vcd
 ifeq ($(VISUAL), 1)
-	$(AT)gtkwave $(WORKDIR)/$@.vcd
+	$(AT)gtkwave $(WORKDIR)/$(COMPONENT_TO_TEST)_test.vcd
 endif
 
 .PHONY: all analyse check_syntax clean test
